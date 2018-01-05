@@ -11,14 +11,18 @@ $Description = 'Validate existence and membership of DRS Host Groups'
 [ScriptBlock]$Desired = {
     #Builds a string array of group|membername for comparison with actual
     $tmpDesired = @()
-    foreach ($group in $cfg.cluster.drsVMHostGroups) {
-        #Want to account for existence of empty groups as well
-        $tmpDesired += ($group.name).ToLower()
-        foreach ($member in $group.members) {
-            $tmpDesired += ($group.name + "|" + $member).ToLower()
+    if( $cfg.cluster.drsVMHostGroups.length -ge 1) {
+        foreach ($group in $cfg.cluster.drsVMHostGroups) {
+            #Want to account for existence of empty groups as well
+            $tmpDesired += ($group.name).ToLower()
+            foreach ($member in $group.members) {
+                $tmpDesired += ($group.name + "|" + $member).ToLower()
+            }
         }
+        $tmpDesired
+    } else {
+        ""
     }
-    $tmpDesired
 }
 # The test value's data type, to help with conversion: bool/string/int
 $Type = 'string[]'
@@ -28,14 +32,18 @@ $Type = 'string[]'
    # [string[]]
     $tmpActual = @()
     $groups = Get-DrsClusterGroup -Cluster $object -Type VMHostGroup
-    foreach ($group in $groups) {
-        #account for empty groups
-        $tmpActual += ($group.name).ToLower()
-        foreach ($member in $group.member) {
-            $tmpActual += ($group.name + "|"+  $member.name).ToLower()
+    if ($groups.length -ge 1) {
+        foreach ($group in $groups) {
+            #account for empty groups
+            $tmpActual += ($group.name).ToLower()
+            foreach ($member in $group.member) {
+                $tmpActual += ($group.name + "|"+  $member.name).ToLower()
+            }
         }
+        $tmpActual
+    } else {
+        ""
     }
-    $tmpActual
 }
 #>
 # The command(s) to match the environment to the config

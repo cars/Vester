@@ -11,10 +11,14 @@ $Description = 'Validate existence and configuration of DRS VMHost Rules'
 [ScriptBlock]$Desired = {
     #Builds a string array of group|membername for comparison with actual
     $tmpDesired = @()
-    foreach ($rule in $cfg.cluster.drsVMHostRules) {
-        $tmpDesired += ($rule.name + "|"+ $rule.type + "|" + $rule.VMGroup + "|" + $rule.VMHostGroup + "|" + $rule.enabled).ToLower()
+    if ($cft.cluster.drsVMHostRules.Length -ge 1) {
+        foreach ($rule in $cfg.cluster.drsVMHostRules) {
+            $tmpDesired += ($rule.name + "|"+ $rule.type + "|" + $rule.VMGroup + "|" + $rule.VMHostGroup + "|" + $rule.enabled).ToLower()
+        }
+        $tmpDesired
+    } else {
+        ""
     }
-    $tmpDesired
 }
 # The test value's data type, to help with conversion: bool/string/int
 $Type = 'string[]'
@@ -24,10 +28,14 @@ $Type = 'string[]'
    # [string[]]
     $tmpActual = @()
     $rules = Get-DrsVMHostRule -Cluster $object 
-    foreach ($rule in $rules) {
-        $tmpActual += ($rule.name+ "|" + $rule.type + "|" + $rule.VMGroup + "|" + $rule.VMHostGroup + "|" + $rule.enabled).ToLower()
+    if ($rules.length -ge 1) {
+        foreach ($rule in $rules) {
+            $tmpActual += ($rule.name+ "|" + $rule.type + "|" + $rule.VMGroup + "|" + $rule.VMHostGroup + "|" + $rule.enabled).ToLower()
+        }
+        $tmpActual
+    } else {
+        ""
     }
-    $tmpActual
 }
 #>
 # The command(s) to match the environment to the config
